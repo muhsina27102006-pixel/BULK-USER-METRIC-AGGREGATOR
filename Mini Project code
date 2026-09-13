@@ -1,0 +1,30 @@
+
+users <- data.frame(
+  User_ID = 1:10,
+  Logins = c(20, 35, 15, 40, 28, 10, 45, 30, 18, 50),
+  Posts = c(5, 10, 3, 8, 6, 2, 12, 7, 4, 15),
+  Likes = c(50, 80, 30, 100, 60, 20, 120, 70, 40, 150),
+  Comments = c(10, 15, 5, 20, 12, 3, 25, 14, 6, 30)
+)
+
+# Calculate metrics
+
+total_users <- nrow(users)
+
+active_users <- sum(users$Logins >= 25)
+
+total_posts <- sum(users$Posts)
+
+total_likes <- sum(users$Likes)
+
+total_comments <- sum(users$Comments)
+
+# Display results
+
+cat("BULK USER METRIC AGGREGATOR\n")
+cat("---------------------------\n")
+cat("Total Users    :", total_users, "\n")
+cat("Active Users   :", active_users, "\n")
+cat("Total Posts    :", total_posts, "\n")
+cat("Total Likes    :", total_likes, "\n")
+cat("Total Comments :", total_comments, "\n")
