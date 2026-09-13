@@ -1,0 +1,105 @@
+library(shiny)
+library(ggplot2)
+
+ui <- fluidPage(
+
+  titlePanel("Bulk User Metric Aggregator"),
+
+  sidebarLayout(
+
+    sidebarPanel(
+      h4("Admin Panel"),
+
+      numericInput(
+        "users",
+        "Number of Users:",
+        value = 100,
+        min = 10,
+        max = 1000
+      ),
+
+      actionButton(
+        "compile",
+        "Compile Global Metrics"
+      )
+    ),
+
+    mainPanel(
+
+      h3("Global Metrics"),
+
+      verbatimTextOutput("metrics"),
+
+      h3("User Activity"),
+
+      plotOutput("activityPlot")
+    )
+  )
+)
+
+
+server <- function(input, output) {
+
+  data <- eventReactive(input$compile, {
+
+    set.seed(123)
+
+    users <- data.frame(
+      User_ID = 1:input$users,
+      Logins = sample(1:50, input$users, replace = TRUE),
+      Posts = sample(0:20, input$users, replace = TRUE),
+      Likes = sample(0:200, input$users, replace = TRUE),
+      Comments = sample(0:100, input$users, replace = TRUE)
+    )
+
+    users
+  })
+
+
+  output$metrics <- renderPrint({
+
+    users <- data()
+
+    total_users <- nrow(users)
+
+    active_users <- sum(users$Logins >= 25)
+
+    total_posts <- sum(users$Posts)
+
+    total_likes <- sum(users$Likes)
+
+    total_comments <- sum(users$Comments)
+
+    cat("Total Users    :", total_users, "\n")
+    cat("Active Users   :", active_users, "\n")
+    cat("Total Posts    :", total_posts, "\n")
+    cat("Total Likes    :", total_likes, "\n")
+    cat("Total Comments :", total_comments, "\n")
+  })
+
+
+  output$activityPlot <- renderPlot({
+
+    users <- data()
+
+    metrics <- data.frame(
+      Activity = c("Posts", "Likes", "Comments"),
+      Count = c(
+        sum(users$Posts),
+        sum(users$Likes),
+        sum(users$Comments)
+      )
+    )
+
+    ggplot(metrics, aes(x = Activity, y = Count)) +
+      geom_col() +
+      labs(
+        title = "Global User Activity",
+        x = "Activity",
+        y = "Total Count"
+      )
+  })
+}
+
+
+shinyApp(ui = ui, server = server)
